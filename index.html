@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CaiSH</title>
+    <script>
+      window.addEventListener('error', (e) => {
+        if (e.message.includes('ResizeObserver loop completed with undelivered notifications.') || 
+            e.message.includes('ResizeObserver loop limit exceeded')) {
+          const resizeObserverErrDiv = document.getElementById(
+            'webpack-dev-server-client-overlay-div'
+          );
+          const resizeObserverErr = document.getElementById(
+            'webpack-dev-server-client-overlay'
+          );
+          if (resizeObserverErr) {
+            resizeObserverErr.setAttribute('style', 'display: none');
+          }
+          if (resizeObserverErrDiv) {
+            resizeObserverErrDiv.setAttribute('style', 'display: none');
+          }
+          const viteOverlay = document.querySelectorAll('vite-error-overlay');
+          viteOverlay.forEach(el => el.style.display = 'none');
+          e.stopImmediatePropagation();
+          e.preventDefault();
+          return;
+        }
+        const root = document.getElementById('root');
+        if (root && !root.dataset.reactMounted) {
+          root.innerHTML = `
+            <div style="min-height:100vh;background:#050505;color:#e2e8f0;font-family:Inter,system-ui,sans-serif;display:flex;align-items:center;justify-content:center;padding:32px;">
+              <div style="max-width:720px;border:1px solid rgba(255,255,255,.14);background:rgba(15,23,42,.72);border-radius:24px;padding:28px;box-shadow:0 24px 80px rgba(0,0,0,.45)">
+                <div style="font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:#60a5fa;font-weight:800;margin-bottom:12px;">CaiSH Startup Error</div>
+                <h1 style="font-size:28px;line-height:1.1;margin:0 0 12px;">The demo hit a browser runtime error.</h1>
+                <pre style="white-space:pre-wrap;color:#94a3b8;font-size:12px;line-height:1.5;background:rgba(0,0,0,.28);padding:16px;border-radius:14px;overflow:auto;">${String(e.message || e.error || 'Unknown error')}</pre>
+              </div>
+            </div>
+          `;
+        }
+      });
+    </script>
+  </head>
+  <body>
+    <div id="root">
+      <div style="min-height:100vh;background:#050505;color:#e2e8f0;font-family:Inter,system-ui,sans-serif;display:flex;align-items:center;justify-content:center;">
+        <div style="font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:#60a5fa;font-weight:800;">Loading CaiSH...</div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
