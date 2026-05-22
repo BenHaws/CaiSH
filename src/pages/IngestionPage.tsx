@@ -3,6 +3,28 @@ import { motion, AnimatePresence } from 'motion/react';
 import { FileCode, Upload, ArrowRight, Code, Database, CheckCircle2, AlertCircle, Terminal, FileText, BrainCircuit, ShieldCheck } from 'lucide-react';
 import { treasuryService } from '../services/treasuryService';
 
+const SAMPLE_PACS_008 = `<?xml version="1.0" encoding="UTF-8"?>
+<Document>
+  <FIToFICstmrCdtTrf>
+    <GrpHdr>
+      <MsgId>CAISH-SAMPLE-PACS008-001</MsgId>
+      <CreDtTm>2026-05-22T13:30:00Z</CreDtTm>
+    </GrpHdr>
+    <CdtTrfTxInf>
+      <PmtId>
+        <EndToEndId>E2E-ENERGY-HEDGE-SETTLE-001</EndToEndId>
+      </PmtId>
+      <IntrBkSttlmAmt Ccy="USD">1250000.00</IntrBkSttlmAmt>
+      <Dbtr>
+        <Nm>Global Parent Corp</Nm>
+      </Dbtr>
+      <Cdtr>
+        <Nm>Acme Logistics</Nm>
+      </Cdtr>
+    </CdtTrfTxInf>
+  </FIToFICstmrCdtTrf>
+</Document>`;
+
 export default function IngestionPage() {
   const [xmlContent, setXmlContent] = useState<string>('');
   const [parsedEntries, setParsedEntries] = useState<any[]>([]);
@@ -57,6 +79,11 @@ export default function IngestionPage() {
     setIsProcessing(false);
   };
 
+  const loadSample = () => {
+    setXmlContent(SAMPLE_PACS_008);
+    processXml(SAMPLE_PACS_008);
+  };
+
   return (
     <div className="space-y-12 pb-20">
       <div className="flex justify-between items-end">
@@ -78,10 +105,18 @@ export default function IngestionPage() {
                  <h3 className="text-sm font-bold uppercase tracking-widest text-[#a855f7] flex items-center gap-2">
                     <FileCode className="w-4 h-4" /> Raw MX Payload
                  </h3>
-                 <label className="cursor-pointer px-4 py-2 bg-blue-600 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:bg-blue-500 transition-all">
-                    Upload XML
-                    <input type="file" className="hidden" onChange={handleFileUpload} accept=".xml" />
-                 </label>
+                 <div className="flex gap-2">
+                   <button
+                     onClick={loadSample}
+                     className="px-4 py-2 bg-white/10 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:bg-white/15 transition-all"
+                   >
+                     Load Sample
+                   </button>
+                   <label className="cursor-pointer px-4 py-2 bg-blue-600 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:bg-blue-500 transition-all">
+                      Upload XML
+                      <input type="file" className="hidden" onChange={handleFileUpload} accept=".xml" />
+                   </label>
+                 </div>
               </div>
 
               <textarea 
@@ -149,7 +184,7 @@ export default function IngestionPage() {
                         <div className="flex-1 space-y-3">
                            <div className="flex justify-between items-baseline">
                               <h4 className="text-xs font-bold text-white uppercase tracking-wider">{entry.description}</h4>
-                              <span className="text-sm font-mono font-bold text-white">
+                              <span className="text-sm font-mono font-bold text-white text-right tabular-nums max-w-[140px] break-words leading-5">
                                 {entry.debit ? '-' : '+'}{(entry.debit || entry.credit || 0).toLocaleString()} {entry.currency}
                               </span>
                            </div>

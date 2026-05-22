@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { Globe, Zap, Cpu, Shield, Crosshair, RadioTower, Banknote, Orbit, Rocket } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
-type DeploymentHub = 'EARTH' | 'MARS';
+type DeploymentHub = 'EARTH' | 'OFF_EARTH' | 'ORBITAL' | 'MARS';
 
 interface HubConfig {
   id: DeploymentHub;
   title: string;
+  titleAccent: string;
   subtitle: string;
   image: string;
   stats: { label: string; value: string; icon: any }[];
@@ -17,7 +18,8 @@ interface HubConfig {
 const HUBS: Record<DeploymentHub, HubConfig> = {
   EARTH: {
     id: 'EARTH',
-    title: 'Global Settlement Map',
+    title: 'Global Payment',
+    titleAccent: 'Routes',
     subtitle: 'Payment Vector: EARTH-01',
     image: 'https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=2069&auto=format&fit=crop',
     accentColor: 'blue',
@@ -28,9 +30,38 @@ const HUBS: Record<DeploymentHub, HubConfig> = {
       { label: 'Latency', value: '120ms', icon: Zap }
     ]
   },
+  OFF_EARTH: {
+    id: 'OFF_EARTH',
+    title: 'Off-Earth',
+    titleAccent: 'Asset Management',
+    subtitle: 'Asset Vector: LUNAR-02',
+    image: 'https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?q=80&w=2072&auto=format&fit=crop',
+    accentColor: 'cyan',
+    vibe: 'Lunar Treasury Asset View',
+    stats: [
+      { label: 'Asset Nodes', value: '7', icon: Orbit },
+      { label: 'Escrow Health', value: '98.6%', icon: Shield },
+      { label: 'Relay Lag', value: '1.3s', icon: Zap }
+    ]
+  },
+  ORBITAL: {
+    id: 'ORBITAL',
+    title: 'Orbital',
+    titleAccent: 'Asset Management',
+    subtitle: 'Asset Vector: ORBIT-03',
+    image: 'https://images.unsplash.com/photo-1454789548928-9efd52dc4031?q=80&w=2080&auto=format&fit=crop',
+    accentColor: 'violet',
+    vibe: 'Orbital Custody Control Plane',
+    stats: [
+      { label: 'Orbital Assets', value: '12', icon: Rocket },
+      { label: 'Custody Proof', value: '99.2%', icon: Shield },
+      { label: 'Telemetry', value: 'Live', icon: RadioTower }
+    ]
+  },
   MARS: {
     id: 'MARS',
-    title: 'Ares Network',
+    title: 'Ares',
+    titleAccent: 'Network',
     subtitle: 'Neural Vector: RED-HUB',
     image: 'https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?q=80&w=1974&auto=format&fit=crop',
     accentColor: 'red',
@@ -63,6 +94,13 @@ const PAYMENT_ROUTES = [
   { from: 'LDN', to: 'SGP', value: '$11.6M', delay: 3 },
 ];
 
+const ASSET_NODES = [
+  { id: 'LUNA-1', label: 'Lunar Escrow', x: 34, y: 44, amount: '$18.2M', tone: 'cyan' },
+  { id: 'LUNA-2', label: 'Regolith Rights', x: 47, y: 57, amount: '$9.4M', tone: 'blue' },
+  { id: 'ORBIT-1', label: 'Orbital SPV', x: 62, y: 38, amount: '$31.7M', tone: 'purple' },
+  { id: 'ORBIT-2', label: 'Telemetry Lease', x: 73, y: 61, amount: '$6.8M', tone: 'emerald' },
+];
+
 const hubById = Object.fromEntries(PAYMENT_HUBS.map(hub => [hub.id, hub]));
 
 const routePath = (fromId: string, toId: string) => {
@@ -82,12 +120,55 @@ const toneClass: Record<string, string> = {
   rose: 'bg-rose-400 shadow-rose-400/60 border-rose-200/60',
 };
 
+const accentClasses: Record<DeploymentHub, { border: string; bg: string; text: string; dot: string; active: string; inactiveHover: string }> = {
+  EARTH: {
+    border: 'border-blue-500/20',
+    bg: 'bg-blue-500/5',
+    text: 'text-blue-400',
+    dot: 'bg-blue-500 shadow-blue-500/50',
+    active: 'border-blue-500/40 bg-blue-500/10 text-white',
+    inactiveHover: 'hover:border-blue-500/30 hover:text-white'
+  },
+  OFF_EARTH: {
+    border: 'border-cyan-500/25',
+    bg: 'bg-cyan-500/5',
+    text: 'text-cyan-300',
+    dot: 'bg-cyan-400 shadow-cyan-400/50',
+    active: 'border-cyan-400/50 bg-cyan-400/10 text-white shadow-[0_0_24px_rgba(34,211,238,0.12)]',
+    inactiveHover: 'hover:border-cyan-400/30 hover:text-cyan-100'
+  },
+  ORBITAL: {
+    border: 'border-violet-500/25',
+    bg: 'bg-violet-500/5',
+    text: 'text-violet-300',
+    dot: 'bg-violet-400 shadow-violet-400/50',
+    active: 'border-violet-400/50 bg-violet-400/10 text-white shadow-[0_0_24px_rgba(167,139,250,0.14)]',
+    inactiveHover: 'hover:border-violet-400/30 hover:text-violet-100'
+  },
+  MARS: {
+    border: 'border-red-500/20',
+    bg: 'bg-red-500/5',
+    text: 'text-red-400',
+    dot: 'bg-red-500 shadow-red-500/50',
+    active: 'border-red-500/40 bg-red-500/10 text-white',
+    inactiveHover: 'hover:border-red-500/30 hover:text-white'
+  }
+};
+
 export default function GlobalPulseMap() {
-  const [currentHub, setCurrentHub] = useState<DeploymentHub>('EARTH');
+  const [currentHub, setCurrentHub] = useState<DeploymentHub>(() => {
+    const saved = window.localStorage.getItem('caish-global-pulse-mode') as DeploymentHub | null;
+    return saved && saved in HUBS ? saved : 'EARTH';
+  });
   const config = HUBS[currentHub];
+  const accent = accentClasses[currentHub];
+  const setPulseHub = (hub: DeploymentHub) => {
+    setCurrentHub(hub);
+    window.localStorage.setItem('caish-global-pulse-mode', hub);
+  };
 
   const toggleMars = () => {
-    setCurrentHub(prev => prev === 'MARS' ? 'EARTH' : 'MARS');
+    setPulseHub(currentHub === 'MARS' ? 'EARTH' : 'MARS');
   };
 
   return (
@@ -181,32 +262,83 @@ export default function GlobalPulseMap() {
         </div>
       )}
 
+      {(currentHub === 'OFF_EARTH' || currentHub === 'ORBITAL') && (
+        <div className="absolute inset-0">
+          <div className={`absolute inset-0 ${
+            currentHub === 'OFF_EARTH'
+              ? 'bg-[radial-gradient(circle_at_38%_44%,rgba(34,211,238,0.24),transparent_24%),radial-gradient(circle_at_70%_55%,rgba(59,130,246,0.16),transparent_30%),linear-gradient(180deg,rgba(2,6,23,0.08),rgba(2,6,23,0.8))]'
+              : 'bg-[radial-gradient(circle_at_62%_38%,rgba(167,139,250,0.24),transparent_24%),radial-gradient(circle_at_42%_62%,rgba(34,211,238,0.14),transparent_30%),linear-gradient(180deg,rgba(2,6,23,0.08),rgba(2,6,23,0.8))]'
+          }`} />
+          <svg className="absolute inset-0 w-full h-full opacity-80" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="assetRouteGradient" x1="0" x2="1" y1="0" y2="0">
+                <stop offset="0%" stopColor={currentHub === 'OFF_EARTH' ? '#22d3ee' : '#a78bfa'} stopOpacity="0.12" />
+                <stop offset="50%" stopColor="#f8fafc" stopOpacity="0.75" />
+                <stop offset="100%" stopColor={currentHub === 'OFF_EARTH' ? '#60a5fa' : '#22d3ee'} stopOpacity="0.18" />
+              </linearGradient>
+            </defs>
+            <motion.ellipse
+              cx="52"
+              cy="52"
+              rx={currentHub === 'OFF_EARTH' ? '34' : '38'}
+              ry={currentHub === 'OFF_EARTH' ? '18' : '24'}
+              fill="none"
+              stroke="url(#assetRouteGradient)"
+              strokeWidth="0.45"
+              strokeDasharray="2 2"
+              initial={{ pathLength: 0, opacity: 0 }}
+              animate={{ pathLength: 1, opacity: 1 }}
+              transition={{ duration: 1.2 }}
+            />
+            <motion.ellipse
+              cx="52"
+              cy="52"
+              rx={currentHub === 'OFF_EARTH' ? '22' : '26'}
+              ry={currentHub === 'OFF_EARTH' ? '38' : '31'}
+              fill="none"
+              stroke="rgba(148,163,184,0.18)"
+              strokeWidth="0.3"
+              strokeDasharray="1.5 2.5"
+              animate={{ opacity: [0.25, 0.75, 0.25] }}
+              transition={{ duration: 4, repeat: Infinity }}
+            />
+          </svg>
+
+          {ASSET_NODES.map((node, i) => (
+            <motion.div
+              key={`${currentHub}-${node.id}`}
+              initial={{ opacity: 0, scale: 0.7 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: i * 0.1 }}
+              className="absolute -translate-x-1/2 -translate-y-1/2 pointer-events-auto group/hub"
+              style={{ left: `${node.x}%`, top: `${node.y}%` }}
+            >
+              <div className={`relative w-4 h-4 rounded-full border shadow-[0_0_22px_currentColor] ${toneClass[node.tone]}`}>
+                <span className="absolute inset-[-14px] rounded-full border border-current opacity-20 animate-ping" />
+              </div>
+              <div className="absolute left-5 top-1/2 -translate-y-1/2 opacity-0 group-hover/hub:opacity-100 transition-opacity whitespace-nowrap px-3 py-2 rounded-xl bg-slate-950/85 border border-white/10 backdrop-blur-xl shadow-2xl">
+                <p className="text-[9px] font-black uppercase tracking-widest text-white">{node.label}</p>
+                <p className="text-[10px] font-mono text-cyan-300 mt-0.5">{node.amount} managed value</p>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      )}
+
       {/* HUD-style Overlay */}
-      <div className="absolute inset-0 pointer-events-none p-12 flex flex-col justify-between">
+      <div className="absolute inset-0 pointer-events-none p-8 xl:p-12 flex flex-col justify-between">
         <div className="flex justify-between items-start">
-           <div className={`p-8 liquid-glass backdrop-blur-xl rounded-[32px] transition-all duration-700 ${
-             currentHub === 'MARS' ? 'border-red-500/20 bg-red-500/5' : 
-             'border-blue-500/20 bg-blue-500/5'
-           }`}>
+           <div className={`p-6 xl:p-8 liquid-glass backdrop-blur-xl rounded-[32px] transition-all duration-700 ${accent.border} ${accent.bg}`}>
               <div className="flex items-center gap-3 mb-2">
                  <motion.div 
                     animate={{ opacity: [1, 0.4, 1] }}
                     transition={{ repeat: Infinity, duration: 2 }}
-                    className={`w-2 h-2 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.5)] ${
-                      currentHub === 'MARS' ? 'bg-red-500 shadow-red-500/50' :
-                      'bg-blue-500 shadow-blue-500/50'
-                    }`} 
+                    className={`w-2 h-2 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.5)] ${accent.dot}`}
                  />
-                 <span className={`text-[10px] font-black uppercase tracking-[0.5em] ${
-                   currentHub === 'MARS' ? 'text-red-400' :
-                   'text-blue-400'
-                 }`}>Nexus Synchronization</span>
+                 <span className={`text-[10px] font-black uppercase tracking-[0.5em] ${accent.text}`}>Nexus Synchronization</span>
               </div>
-              <h3 className="text-3xl font-light text-white tracking-tighter uppercase font-mono mb-2 max-w-[520px]">
-                {currentHub === 'EARTH' ? 'Global ' : config.title.split(' ')[0]} <span className={
-                  currentHub === 'MARS' ? 'text-red-500' :
-                  'text-blue-500'
-                }>{currentHub === 'EARTH' ? 'Payment Routes' : config.title.split(' ')[1]}</span>
+              <h3 className="text-2xl xl:text-3xl font-light text-white tracking-tighter uppercase font-mono mb-2 max-w-[520px]">
+                {config.title} <span className={accent.text}>{config.titleAccent}</span>
               </h3>
               
               {/* HIDDEN MARS TRIGGER */}
@@ -239,7 +371,7 @@ export default function GlobalPulseMap() {
               {(['EARTH'] as DeploymentHub[]).map(hub => (
                 <button
                   key={hub}
-                  onClick={() => setCurrentHub(hub)}
+                  onClick={() => setPulseHub(hub)}
                   className={`px-6 py-4 rounded-2xl border flex items-center gap-3 transition-all duration-300 ${
                     currentHub === hub 
                       ? 'border-blue-500/40 bg-blue-500/10 text-white'
@@ -254,29 +386,34 @@ export default function GlobalPulseMap() {
                 <Banknote className="w-4 h-4 text-cyan-400" />
                 <span className="text-[10px] font-black uppercase tracking-widest">SWIFT gpi</span>
               </div>
-              <div
-                className="w-14 h-14 rounded-2xl border border-white/5 bg-white/[0.02] text-slate-500 flex items-center justify-center"
+              <button
+                onClick={() => setPulseHub('OFF_EARTH')}
+                className={`w-14 h-14 rounded-2xl border flex items-center justify-center transition-all duration-300 ${
+                  currentHub === 'OFF_EARTH'
+                    ? accentClasses.OFF_EARTH.active
+                    : `border-white/5 bg-white/[0.02] text-slate-500 ${accentClasses.OFF_EARTH.inactiveHover}`
+                }`}
                 title="Off-Earth Asset Management"
                 aria-label="Off-Earth Asset Management"
               >
                 <Orbit className="w-4 h-4" />
-              </div>
-              <div
-                className="w-14 h-14 rounded-2xl border border-white/5 bg-white/[0.02] text-slate-500 flex items-center justify-center"
+              </button>
+              <button
+                onClick={() => setPulseHub('ORBITAL')}
+                className={`w-14 h-14 rounded-2xl border flex items-center justify-center transition-all duration-300 ${
+                  currentHub === 'ORBITAL'
+                    ? accentClasses.ORBITAL.active
+                    : `border-white/5 bg-white/[0.02] text-slate-500 ${accentClasses.ORBITAL.inactiveHover}`
+                }`}
                 title="Orbital Asset Management"
                 aria-label="Orbital Asset Management"
               >
                 <Rocket className="w-4 h-4" />
-              </div>
+              </button>
            </div>
 
-           <div className={`px-8 py-4 liquid-glass-high rounded-2xl border transition-colors ${
-             currentHub === 'MARS' ? 'border-red-500/30' : 
-             'border-blue-500/30'
-           }`}>
-              <span className={`text-[11px] font-black uppercase tracking-[0.6em] ${
-                currentHub === 'MARS' ? 'text-red-400/60' : 'text-blue-400/60'
-              }`}>{config.vibe}</span>
+           <div className={`px-8 py-4 liquid-glass-high rounded-2xl border transition-colors ${accent.border}`}>
+              <span className={`text-[11px] font-black uppercase tracking-[0.6em] ${accent.text}`}>{config.vibe}</span>
            </div>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { useIndustry } from '../../IndustryContext';
+import { useNavigation } from '../../contexts/NavigationContext';
 
 interface HeaderProps {
   activeTab: string;
@@ -10,6 +11,7 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ activeTab, selectedEntityName, isProduction, setIsProduction }) => {
   const { activeVertical } = useIndustry();
+  const { setActiveTab } = useNavigation();
 
   return (
     <header className="px-12 pt-10 pb-6 flex justify-between items-end border-b border-white/5 relative z-30">
@@ -27,6 +29,14 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, selectedEntityName, i
       </div>
       
       <div className="flex items-center gap-6">
+        <button
+          onClick={() => setActiveTab('admin')}
+          className="hidden md:flex flex-col items-end px-4 py-2 rounded-2xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.06] transition-colors"
+          title="Open Admin Console"
+        >
+          <span className="text-[9px] uppercase tracking-[0.24em] text-slate-500 font-black">Industry Mode</span>
+          <span className="text-xs font-bold text-orange-300">{activeVertical}</span>
+        </button>
         <div className="text-right hidden sm:block">
           <p className="text-sm font-medium text-white">Global Admin</p>
           <p className="text-xs text-slate-400">Identity Verified</p>

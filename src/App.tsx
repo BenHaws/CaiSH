@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   LayoutDashboard, 
@@ -26,8 +26,6 @@ import {
   Anchor,
   Search
 } from 'lucide-react';
-import { InsuranceSolvencyCockpit } from './components/dashboard/InsuranceSolvencyCockpit';
-import { RetailNettingHub } from './components/dashboard/RetailNettingHub';
 import { treasuryService } from './services/treasuryService';
 import { CorporateEntity, BankAccount } from './types';
 
@@ -38,18 +36,9 @@ import ScenarioEngine from './components/dashboard/ScenarioEngine';
 import FXRisk from './components/dashboard/FXRisk';
 import PaymentQueue from './components/dashboard/PaymentQueue';
 import VirtualLedger from './components/dashboard/VirtualLedger';
-import Cerebro from './components/dashboard/Cerebro';
 import SecurityCenter from './components/dashboard/SecurityCenter';
 import ConnectivityWizard from './components/dashboard/ConnectivityWizard';
 
-import WorkingCapitalHub from './components/dashboard/working-capital/WorkingCapitalHub';
-import DebtInvestmentsModule from './components/dashboard/DebtInvestmentsModule';
-import EnergyHedgingCockpit from './components/dashboard/EnergyHedgingCockpit';
-import TechValuationCockpit from './components/dashboard/TechValuationCockpit';
-import ManufacturingCockpit from './components/dashboard/ManufacturingCockpit';
-import RealEstateTrustMonitor from './components/dashboard/RealEstateTrustMonitor';
-import DevGlobalAggregator from './components/dashboard/DevGlobalAggregator';
-import AdminConsole from './components/dashboard/AdminConsole';
 import { IndustryConfig, IndustryVertical } from './types';
 import { IndustryProvider, useIndustry } from './IndustryContext';
 
@@ -62,6 +51,30 @@ import { SimulationProvider, useSimulation } from './contexts/SimulationContext'
 import IngestionPage from './pages/IngestionPage';
 
 import { NavigationProvider, useNavigation } from './contexts/NavigationContext';
+
+const Cerebro = lazy(() => import('./components/dashboard/Cerebro'));
+const WorkingCapitalHub = lazy(() => import('./components/dashboard/working-capital/WorkingCapitalHub'));
+const DebtInvestmentsModule = lazy(() => import('./components/dashboard/DebtInvestmentsModule'));
+const EnergyHedgingCockpit = lazy(() => import('./components/dashboard/EnergyHedgingCockpit'));
+const TechValuationCockpit = lazy(() => import('./components/dashboard/TechValuationCockpit'));
+const ManufacturingCockpit = lazy(() => import('./components/dashboard/ManufacturingCockpit'));
+const RealEstateTrustMonitor = lazy(() => import('./components/dashboard/RealEstateTrustMonitor'));
+const DevGlobalAggregator = lazy(() => import('./components/dashboard/DevGlobalAggregator'));
+const AdminConsole = lazy(() => import('./components/dashboard/AdminConsole'));
+const InsuranceSolvencyCockpit = lazy(() =>
+  import('./components/dashboard/InsuranceSolvencyCockpit').then(module => ({ default: module.InsuranceSolvencyCockpit }))
+);
+const RetailNettingHub = lazy(() =>
+  import('./components/dashboard/RetailNettingHub').then(module => ({ default: module.RetailNettingHub }))
+);
+
+function ModuleFallback() {
+  return (
+    <div className="p-12 glass-card text-center text-xs font-black uppercase tracking-[0.25em] text-slate-500 animate-pulse">
+      Hydrating module...
+    </div>
+  );
+}
 
 function AppContent() {
   const { activeVertical, config } = useIndustry();
@@ -97,7 +110,7 @@ function AppContent() {
 
   const menuItems = [
     { id: 'search', label: 'Search Nexus', icon: Search },
-    { id: 'dashboard', label: 'Liquidity Cockpit', icon: LayoutDashboard },
+    { id: 'dashboard', label: 'Liquidity Dashboard', icon: LayoutDashboard },
     { id: 'cerebro', label: 'Cerebro AI', icon: BrainCircuit },
     { id: 'nexus', label: 'Nexus Topology', icon: Layers },
     { id: 'capital', label: 'Working Capital', icon: Briefcase },
@@ -169,7 +182,7 @@ function AppContent() {
 
   return (
     <div className={`h-screen w-screen h-full flex items-center justify-center p-5 bg-transparent transition-all duration-1000 ${isProduction ? 'ring-1 ring-emerald-500/30' : ''}`}>
-      <div className={`relative liquid-glass-high w-full h-full flex flex-col xl:flex-row shadow-2xl transition-all duration-1000 ${isProduction ? 'shadow-emerald-900/10' : 'shadow-blue-900/10'}`}>
+      <div className={`relative liquid-glass-high w-full h-full flex flex-col md:flex-row shadow-2xl transition-all duration-1000 ${isProduction ? 'shadow-emerald-900/10' : 'shadow-blue-900/10'}`}>
         <Sidebar 
           activeTab={activeTab} 
           setActiveTab={setActiveTab} 
@@ -196,70 +209,72 @@ function AppContent() {
                 exit={{ opacity: 0, scale: 1.02 }}
                 transition={{ duration: 0.3 }}
               >
-                {activeTab === 'dashboard' && (
-                  <CustomDashboardEngine />
-                )}
-                {activeTab === 'cerebro' && (
-                  <Cerebro />
-                )}
-                {activeTab === 'nexus' && (
-                  <NexusView entities={entities} />
-                )}
-                {activeTab === 'capital' && (
-                  <WorkingCapitalHub />
-                )}
-                {activeTab === 'debt' && (
-                  <DebtInvestmentsModule />
-                )}
-                {activeTab === 'energy' && (
-                  <EnergyHedgingCockpit />
-                )}
-                {activeTab === 'tech' && (
-                  <TechValuationCockpit />
-                )}
-                {activeTab === 'manufacturing' && (
-                  <ManufacturingCockpit />
-                )}
-                {activeTab === 'real-estate' && (
-                  <RealEstateTrustMonitor />
-                )}
-                {activeTab === 'dev' && (
-                  <DevGlobalAggregator />
-                )}
-                {activeTab === 'admin' && (
-                  <AdminConsole />
-                )}
-                {activeTab === 'healthcare' && (
-                  <div className="p-20 text-center glass-card border-sky-500/30 bg-sky-500/5">
-                    <Stethoscope className="w-16 h-16 text-sky-500 mx-auto mb-6" />
-                    <h3 className="text-2xl font-bold text-white uppercase tracking-widest mb-4">Claims Reconciliation Engine</h3>
-                    <p className="text-sky-400 font-mono text-xs uppercase italic">Module Initializing: Waiting for Payor Webhook Feed...</p>
-                  </div>
-                )}
-                {activeTab === 'insurance' && selectedEntity && (
-                   <InsuranceSolvencyCockpit entity={selectedEntity} />
-                )}
-                {activeTab === 'retail' && (
-                  <RetailNettingHub />
-                )}
-                {activeTab === 'scenario' && selectedEntity && (
-                  <ScenarioEngine entity={selectedEntity} />
-                )}
-                {activeTab === 'fx' && (
-                  <FXRisk />
-                )}
-                {activeTab === 'payments' && (
-                  <PaymentQueue />
-                )}
-                {activeTab === 'ledger' && (
-                  <VirtualLedger />
-                )}
-                {activeTab === 'ingestion' && (
-                  <IngestionPage />
-                )}
-                {activeTab === 'security' && (
-                  <SecurityCenter triggerWizard={() => setIsOnboarding(true)} />
-                )}
+                <Suspense fallback={<ModuleFallback />}>
+                  {activeTab === 'dashboard' && (
+                    <CustomDashboardEngine />
+                  )}
+                  {activeTab === 'cerebro' && (
+                    <Cerebro />
+                  )}
+                  {activeTab === 'nexus' && (
+                    <NexusView entities={entities} />
+                  )}
+                  {activeTab === 'capital' && (
+                    <WorkingCapitalHub />
+                  )}
+                  {activeTab === 'debt' && (
+                    <DebtInvestmentsModule />
+                  )}
+                  {activeTab === 'energy' && (
+                    <EnergyHedgingCockpit />
+                  )}
+                  {activeTab === 'tech' && (
+                    <TechValuationCockpit />
+                  )}
+                  {activeTab === 'manufacturing' && (
+                    <ManufacturingCockpit />
+                  )}
+                  {activeTab === 'real-estate' && (
+                    <RealEstateTrustMonitor />
+                  )}
+                  {activeTab === 'dev' && (
+                    <DevGlobalAggregator />
+                  )}
+                  {activeTab === 'admin' && (
+                    <AdminConsole />
+                  )}
+                  {activeTab === 'healthcare' && (
+                    <div className="p-20 text-center glass-card border-sky-500/30 bg-sky-500/5">
+                      <Stethoscope className="w-16 h-16 text-sky-500 mx-auto mb-6" />
+                      <h3 className="text-2xl font-bold text-white uppercase tracking-widest mb-4">Claims Reconciliation Engine</h3>
+                      <p className="text-sky-400 font-mono text-xs uppercase italic">Module Initializing: Waiting for Payor Webhook Feed...</p>
+                    </div>
+                  )}
+                  {activeTab === 'insurance' && selectedEntity && (
+                     <InsuranceSolvencyCockpit entity={selectedEntity} />
+                  )}
+                  {activeTab === 'retail' && (
+                    <RetailNettingHub />
+                  )}
+                  {activeTab === 'scenario' && selectedEntity && (
+                    <ScenarioEngine entity={selectedEntity} />
+                  )}
+                  {activeTab === 'fx' && (
+                    <FXRisk />
+                  )}
+                  {activeTab === 'payments' && (
+                    <PaymentQueue />
+                  )}
+                  {activeTab === 'ledger' && (
+                    <VirtualLedger />
+                  )}
+                  {activeTab === 'ingestion' && (
+                    <IngestionPage />
+                  )}
+                  {activeTab === 'security' && (
+                    <SecurityCenter triggerWizard={() => setIsOnboarding(true)} />
+                  )}
+                </Suspense>
               </motion.div>
             </AnimatePresence>
           </div>

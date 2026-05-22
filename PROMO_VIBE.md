@@ -13,12 +13,12 @@ We replace modular fatigue with a **Unified Data Fabric** and a **Nexus Topology
 - **Nexus Topology**: A hierarchical backend (Global Parent -> Subsidiary -> Bank -> Account) with native Row-Level Security (RLS) simulation and **Planetary Relay** expansion.
 
 ### Key Innovations (Series B v4.3)
-1.  **Cosmographic Pulse Map**: Real-time visualization of liquidity across Earth, Moon, ISS, and Mars-Bridge relays.
+1.  **Global Pulse Map**: Real-time visualization of Earth payment routes, Off-Earth asset management, Orbital asset management, and a hidden Mars-Bridge override.
 2.  **Hardened Liquid Glass UI**: Evolution of the "Nexus Dark" aesthetic. Higher contrast, color-coded themes (Emerald/Purple/Amber), and increased readability for mission-critical HUDs.
-3.  **Multi-Vertical Adaptive Fabric**: A dynamic intelligence layer that reconfigures the platform for **Manufacturing, Healthcare, Real Estate, Retail, Tech, Energy, and Insurance**—each with its own proprietary risk invariants.
+3.  **Multi-Vertical Adaptive Fabric**: A dynamic intelligence layer that reconfigures the platform for **Manufacturing, Healthcare, Real Estate, Retail, Tech, Energy, and Insurance** - each with its own proprietary risk invariants.
 4.  **Energy Command Center v4.0**: A best-in-class risk cockpit for commodities. Includes **Nodal Basis Risk** modeling, **Basis Hub** spread analysis, and **NPK-CVaR** tail-risk smoothing.
 5.  **ISO 20022 MX Transformer**: Native, low-latency ingestion of SWIFT pacs.008 and camt.053 XML streams directly into the virtual ledger.
-6.  **Cerebro Strategy Bridge**: Autonomous AI orchestration that doesn't just suggest—it executes. Strategy-to-settlement in a single atomic transaction.
+6.  **Cerebro Strategy Bridge**: Autonomous AI orchestration that doesn't just suggest - it executes. Strategy-to-settlement in a single atomic transaction.
 
 ### Business Philosophy: "Institutional Elegance"
 We build for the **Global CFO**. Clean, "Stripe-meets-Bloomberg" aesthetics with nuclear-grade quantitative power. We turn retrospective reporting into **instantaneous foresight**.
@@ -28,4 +28,4 @@ We build for the **Global CFO**. Clean, "Stripe-meets-Bloomberg" aesthetics with
 
 ---
 *Target Persona: CFOs, Head of Treasury, Global Controllers.*
-*Visual Vibe: Liquid Glass v2, deep space gradients, planetary hub sync, high-fidelity data density.*
+*Visual Vibe: Liquid Glass v2, global route mesh, off-earth/orbital control states, high-fidelity data density.*
