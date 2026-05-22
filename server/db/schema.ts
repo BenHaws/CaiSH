@@ -38,20 +38,33 @@ export const accounts = sqliteTable('accounts', {
   entityId: text('entity_id').notNull().references(() => subsidiaries.id),
 });
 
-// Layer 5: Energy & Commodity Risk (Step 2 - Quantitative Core)
-export const basisHubs = sqliteTable('basis_hubs', {
-  id: text('id').primaryKey(),
+// Layer 5: Energy & Commodity Risk (Nodal Registry for Nexus Topology)
+// Hubs Table: Henry Hub, Waha Hub, SoCal Citygate benchmarks
+export const energyHubs = sqliteTable('energy_hubs', {
+  id: text('id').primaryKey(), // e.g., 'hub-henry', 'hub-waha', 'hub-socal'
+  tenantId: text('tenant_id').notNull(), // Nexus Topology: Global Tenant
   name: text('name').notNull(),
-  benchmarkRef: text('benchmark_ref').notNull(), // e.g., 'Henry Hub', 'WTI'
-  pipelineTariff: real('pipeline_tariff'),
-  isNodal: integer('is_nodal').default(0),
+  locationCode: text('location_code').notNull(), // ISO/Nodal code (e.g., 'US-LLS', 'US-Waha', 'US-Socal')
+  benchmarkType: text('benchmark_type').notNull(), // 'GAS' | 'POWER'
+  currentSpotPrice: real('current_spot_price').default(0),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }),
 });
 
+// Pipeline Tariffs Table: For Basis Spread Calculations
+export const pipelineTariffs = sqliteTable('pipeline_tariffs', {
+  id: text('id').primaryKey(),
+  sourceHubId: text('source_hub_id').references(() => energyHubs.id),
+  destinationHubId: text('destination_hub_id').references(() => energyHubs.id),
+  tariffRate: real('tariff_rate').notNull(),
+  capacityLimit: real('capacity_limit'),
+});
+
+// Commodity Trades (linked to energy hubs for nodal risk)
 export const commodityTrades = sqliteTable('commodity_trades', {
   id: text('id').primaryKey(),
   entityId: text('entity_id').notNull().references(() => subsidiaries.id),
   counterpartyId: text('counterparty_id').notNull(),
-  basisHubId: text('basis_hub_id').references(() => basisHubs.id),
+  energyHubId: text('energy_hub_id').references(() => energyHubs.id),
   deliveryType: text('delivery_type').notNull(), // 'Physical' | 'Financial'
   notional: real('notional').notNull(),
   unit: text('unit').notNull(), // 'MWh', 'BBL', 'MMBtu'
@@ -61,6 +74,7 @@ export const commodityTrades = sqliteTable('commodity_trades', {
   riskScore: real('risk_score'),
 });
 
+// Hedge Relationships (updated to use energy hubs)
 export const hedgeRelationships = sqliteTable('hedge_relationships', {
   id: text('id').primaryKey(),
   objective: text('objective').notNull(),

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Globe, Zap, Cpu, Shield, Crosshair, RadioTower, Banknote, Orbit, Rocket } from 'lucide-react';
+import { Globe, Zap, Cpu, Shield, Crosshair, RadioTower, Banknote, Orbit, Rocket, Star, Satellite } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
-type DeploymentHub = 'EARTH' | 'MARS';
+type DeploymentHub = 'EARTH' | 'MOON' | 'ISS' | 'MARS';
 
 interface HubConfig {
   id: DeploymentHub;
@@ -26,6 +26,32 @@ const HUBS: Record<DeploymentHub, HubConfig> = {
       { label: 'Active Routes', value: '18', icon: RadioTower },
       { label: 'Integrity', value: '99.9%', icon: Shield },
       { label: 'Latency', value: '120ms', icon: Zap }
+    ]
+  },
+  MOON: {
+    id: 'MOON',
+    title: 'Lunar Asset Hub',
+    subtitle: 'Lunar Vector: SECTOR-4',
+    image: 'https://images.unsplash.com/photo-1541963463572-dae8d2733a4c?q=80&w=2070&auto=format&fit=crop',
+    accentColor: 'cyan',
+    vibe: 'Lunar Operations Online',
+    stats: [
+      { label: 'Orbit Altitude', value: '384,400 km', icon: Orbit },
+      { label: 'Resource Yield', value: '2.4M Sol', icon: Banknote },
+      { label: 'Signal Delay', value: '1.3s', icon: Zap }
+    ]
+  },
+  ISS: {
+    id: 'ISS',
+    title: 'Orbital Asset Hub',
+    subtitle: 'Station Vector: ALPHA-7',
+    image: 'https://images.unsplash.com/photo-1614728883729-5e889cdde682?q=80&w=2070&auto=format&fit=crop',
+    accentColor: 'indigo',
+    vibe: 'Orbital Bridge Active',
+    stats: [
+      { label: 'Altitude', value: '408 km', icon: Satellite },
+      { label: 'Daily Yield', value: '890 Sol', icon: Banknote },
+      { label: 'Signal Delay', value: '2.5ms', icon: Zap }
     ]
   },
   MARS: {
@@ -83,11 +109,27 @@ const toneClass: Record<string, string> = {
 };
 
 export default function GlobalPulseMap() {
-  const [currentHub, setCurrentHub] = useState<DeploymentHub>('EARTH');
-  const config = HUBS[currentHub];
+  const [activeRelay, setActiveRelay] = useState<DeploymentHub>('EARTH');
+  const config = HUBS[activeRelay];
+
+  const handleRelaySwitch = () => {
+    // Kinetic accent animation trigger
+    const accentColors: Record<DeploymentHub, string> = {
+      EARTH: 'blue',
+      MOON: 'cyan',
+      ISS: 'indigo',
+      MARS: 'red'
+    };
+    
+    // Trigger kinetic feedback via motion
+    document.body.style.background = `linear-gradient(135deg, ${accentColors[activeRelay] === 'blue' ? '#1e3a8a' : accentColors[activeRelay] === 'cyan' ? '#0e7490' : accentColors[activeRelay] === 'indigo' ? '#312e81' : '#7f1d1d'}15, #02061b)`;
+    setTimeout(() => {
+      document.body.style.background = '';
+    }, 300);
+  };
 
   const toggleMars = () => {
-    setCurrentHub(prev => prev === 'MARS' ? 'EARTH' : 'MARS');
+    setActiveRelay(prev => prev === 'MARS' ? 'EARTH' : 'MARS');
   };
 
   return (
@@ -95,12 +137,12 @@ export default function GlobalPulseMap() {
       {/* Dynamic Environment Background */}
       <AnimatePresence mode="wait">
         <motion.div 
-          key={currentHub}
+          key={activeRelay}
           initial={{ opacity: 0 }}
-          animate={{ opacity: currentHub === 'MARS' ? 0.5 : 0.28 }}
+          animate={{ opacity: activeRelay === 'MARS' ? 0.5 : 0.28 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 1.5 }}
-          className={`absolute inset-0 mix-blend-screen scale-110 ${currentHub === 'MARS' ? 'hue-rotate-[-30deg] saturate-150' : ''}`}
+          className={`absolute inset-0 mix-blend-screen scale-110 ${activeRelay === 'MARS' ? 'hue-rotate-[-30deg] saturate-150' : ''}`}
           style={{
             backgroundImage: `url('${config.image}')`,
             backgroundSize: 'cover',
@@ -109,7 +151,7 @@ export default function GlobalPulseMap() {
         />
       </AnimatePresence>
       
-      {currentHub === 'EARTH' && (
+      {activeRelay === 'EARTH' && (
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(59,130,246,0.22),transparent_40%),linear-gradient(180deg,rgba(2,6,23,0.15),rgba(2,6,23,0.78))]" />
           <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
@@ -185,28 +227,32 @@ export default function GlobalPulseMap() {
       <div className="absolute inset-0 pointer-events-none p-12 flex flex-col justify-between">
         <div className="flex justify-between items-start">
            <div className={`p-8 liquid-glass backdrop-blur-xl rounded-[32px] transition-all duration-700 ${
-             currentHub === 'MARS' ? 'border-red-500/20 bg-red-500/5' : 
+             activeRelay === 'MARS' ? 'border-red-500/20 bg-red-500/5' : 
+             activeRelay === 'MOON' || activeRelay === 'ISS' ? 'border-cyan-500/20 bg-cyan-500/5' :
              'border-blue-500/20 bg-blue-500/5'
            }`}>
               <div className="flex items-center gap-3 mb-2">
                  <motion.div 
                     animate={{ opacity: [1, 0.4, 1] }}
                     transition={{ repeat: Infinity, duration: 2 }}
-                    className={`w-2 h-2 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.5)] ${
-                      currentHub === 'MARS' ? 'bg-red-500 shadow-red-500/50' :
+                    className={`w-2 h-2 rounded-full shadow-[0_0_10px_currentColor] ${
+                      activeRelay === 'MARS' ? 'bg-red-500 shadow-red-500/50' :
+                      activeRelay === 'MOON' || activeRelay === 'ISS' ? 'bg-cyan-500 shadow-cyan-500/50' :
                       'bg-blue-500 shadow-blue-500/50'
                     }`} 
                  />
                  <span className={`text-[10px] font-black uppercase tracking-[0.5em] ${
-                   currentHub === 'MARS' ? 'text-red-400' :
+                   activeRelay === 'MARS' ? 'text-red-400' :
+                   activeRelay === 'MOON' || activeRelay === 'ISS' ? 'text-cyan-400' :
                    'text-blue-400'
                  }`}>Nexus Synchronization</span>
               </div>
               <h3 className="text-3xl font-light text-white tracking-tighter uppercase font-mono mb-2 max-w-[520px]">
-                {currentHub === 'EARTH' ? 'Global ' : config.title.split(' ')[0]} <span className={
-                  currentHub === 'MARS' ? 'text-red-500' :
+                {activeRelay === 'EARTH' ? 'Global ' : activeRelay === 'MOON' || activeRelay === 'ISS' ? config.title.split(' ')[0] + ' ' : config.title.split(' ')[0]} <span className={
+                  activeRelay === 'MARS' ? 'text-red-500' :
+                  activeRelay === 'MOON' || activeRelay === 'ISS' ? 'text-cyan-500' :
                   'text-blue-500'
-                }>{currentHub === 'EARTH' ? 'Payment Routes' : config.title.split(' ')[1]}</span>
+                }>{activeRelay === 'EARTH' ? 'Payment Routes' : config.title.split(' ')[1]}</span>
               </h3>
               
               {/* HIDDEN MARS TRIGGER */}
@@ -222,62 +268,74 @@ export default function GlobalPulseMap() {
            </div>
 
            <div className="flex gap-4">
-              {config.stats.map((stat, i) => (
-                <div key={i} className="px-8 py-6 glass-card bg-slate-950/60 border-white/5 text-center backdrop-blur-md">
-                   <p className="text-[8px] text-slate-500 font-bold uppercase tracking-widest mb-2 flex items-center justify-center gap-2">
-                     <stat.icon className="w-3 h-3" /> {stat.label}
-                   </p>
-                   <p className="text-2xl font-bold text-white font-mono tracking-tighter">{stat.value}</p>
-                </div>
-              ))}
+             {config.stats.map((stat, i) => (
+               <div key={i} className="px-8 py-6 glass-card bg-slate-950/60 border-white/5 text-center backdrop-blur-md">
+                  <p className="text-[8px] text-slate-500 font-bold uppercase tracking-widest mb-2 flex items-center justify-center gap-2">
+                    <stat.icon className="w-3 h-3" /> {stat.label}
+                  </p>
+                  <p className="text-2xl font-bold text-white font-mono tracking-tighter">{stat.value}</p>
+               </div>
+             ))}
            </div>
         </div>
 
         <div className="flex justify-between items-end">
-           {/* Hub Switch UI */}
-           <div className="pointer-events-auto flex gap-2">
-              {(['EARTH'] as DeploymentHub[]).map(hub => (
-                <button
-                  key={hub}
-                  onClick={() => setCurrentHub(hub)}
-                  className={`px-6 py-4 rounded-2xl border flex items-center gap-3 transition-all duration-300 ${
-                    currentHub === hub 
-                      ? 'border-blue-500/40 bg-blue-500/10 text-white'
-                      : 'border-white/5 bg-white/[0.02] text-slate-500 hover:text-white'
-                  }`}
-                >
-                  <Globe className="w-4 h-4" />
-                  <span className="text-[10px] font-black uppercase tracking-widest">{hub}</span>
-                </button>
-              ))}
-              <div className="px-6 py-4 rounded-2xl border border-white/5 bg-white/[0.02] text-slate-500 flex items-center gap-3">
-                <Banknote className="w-4 h-4 text-cyan-400" />
-                <span className="text-[10px] font-black uppercase tracking-widest">SWIFT gpi</span>
-              </div>
-              <div
-                className="w-14 h-14 rounded-2xl border border-white/5 bg-white/[0.02] text-slate-500 flex items-center justify-center"
-                title="Off-Earth Asset Management"
-                aria-label="Off-Earth Asset Management"
-              >
-                <Orbit className="w-4 h-4" />
-              </div>
-              <div
-                className="w-14 h-14 rounded-2xl border border-white/5 bg-white/[0.02] text-slate-500 flex items-center justify-center"
-                title="Orbital Asset Management"
-                aria-label="Orbital Asset Management"
-              >
-                <Rocket className="w-4 h-4" />
-              </div>
-           </div>
+          {/* Hub Switch UI - Three Circular Buttons in Bottom-Right Panel */}
+          <div className="pointer-events-auto flex gap-2">
+            {/* EARTH Button: Globe icon + "EARTH" label */}
+            <button
+              onClick={() => setActiveRelay('EARTH')}
+              className={`w-14 h-14 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
+                activeRelay === 'EARTH' 
+                  ? 'border-blue-500/60 bg-blue-500/10 text-white shadow-[0_0_30px_rgba(59,130,246,0.3)]'
+                  : 'border-white/10 bg-white/[0.02] text-slate-500 hover:text-white hover:border-white/20'
+              }`}
+            >
+              <Globe className="w-5 h-5" />
+              <span className="text-[9px] font-black uppercase tracking-widest ml-1">EARTH</span>
+            </button>
 
-           <div className={`px-8 py-4 liquid-glass-high rounded-2xl border transition-colors ${
-             currentHub === 'MARS' ? 'border-red-500/30' : 
-             'border-blue-500/30'
-           }`}>
-              <span className={`text-[11px] font-black uppercase tracking-[0.6em] ${
-                currentHub === 'MARS' ? 'text-red-400/60' : 'text-blue-400/60'
-              }`}>{config.vibe}</span>
-           </div>
+            {/* MOON Button: Rocket icon only (no text label) */}
+            <button
+              onClick={() => setActiveRelay('MOON')}
+              className={`w-14 h-14 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
+                activeRelay === 'MOON' 
+                  ? 'border-cyan-500/60 bg-cyan-500/10 text-white shadow-[0_0_30px_rgba(6,182,212,0.3)]'
+                  : 'border-white/10 bg-white/[0.02] text-slate-500 hover:text-white hover:border-white/20'
+              }`}
+            >
+              <Rocket className="w-5 h-5" />
+            </button>
+
+            {/* ISS Button: Orbit icon only (no text label) */}
+            <button
+              onClick={() => setActiveRelay('ISS')}
+              className={`w-14 h-14 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
+                activeRelay === 'ISS' 
+                  ? 'border-indigo-500/60 bg-indigo-500/10 text-white shadow-[0_0_30px_rgba(99,102,241,0.3)]'
+                  : 'border-white/10 bg-white/[0.02] text-slate-500 hover:text-white hover:border-white/20'
+              }`}
+            >
+              <Orbit className="w-5 h-5" />
+            </button>
+
+            {/* SWIFT GPI indicator */}
+            <div className="px-6 py-4 rounded-2xl border border-white/5 bg-white/[0.02] text-slate-500 flex items-center gap-3">
+              <Banknote className="w-4 h-4 text-cyan-400" />
+              <span className="text-[10px] font-black uppercase tracking-widest">SWIFT gpi</span>
+            </div>
+          </div>
+
+          <div className={`px-8 py-4 liquid-glass-high rounded-2xl border transition-colors ${
+            activeRelay === 'MARS' ? 'border-red-500/30' : 
+            activeRelay === 'MOON' || activeRelay === 'ISS' ? 'border-cyan-500/30' :
+            'border-blue-500/30'
+          }`}>
+             <span className={`text-[11px] font-black uppercase tracking-[0.6em] ${
+               activeRelay === 'MARS' ? 'text-red-400/60' : 
+               activeRelay === 'MOON' || activeRelay === 'ISS' ? 'text-cyan-400/60' : 'text-blue-400/60'
+             }`}>{config.vibe}</span>
+          </div>
         </div>
       </div>
 

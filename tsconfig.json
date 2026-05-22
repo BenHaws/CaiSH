@@ -7,9 +7,10 @@
     "lib": [
       "ES2022",
       "DOM",
-      "DOM.Iterable"
+      "DOM.Iterable",
+      "DOM.React"
     ],
-    "skipLibCheck": true,
+    "skipLibCheck": false,
     "moduleResolution": "bundler",
     "isolatedModules": true,
     "moduleDetection": "force",

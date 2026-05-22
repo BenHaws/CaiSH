@@ -4,30 +4,52 @@
  */
 
 /**
- * Conditional Value-at-Risk (CVaR) using Nonparametric Kernel (NPK) Framework
- * Models the expected loss given that the loss exceeds the VaR threshold.
- * NPK uses a Kernel distribution to smooth the tail expectation for limited sample sets.
- * @param returns Historical returns array
- * @param alpha Confidence level (e.g., 0.95 or 0.99)
+ * NPK-CVaR Engine v4.0
+ * Uses Gaussian Smoothing for Non-Parametric Tail-Loss Analysis
+ * 
+ * Mathematical Approach:
+ * - Kernel Density Estimation (KDE): Smooth historical loss observations using Gaussian kernel
+ * - VaR Calculation: Find the loss level α where cumulative probability reaches confidence level
+ * - CVaR Calculation: Expected value of losses exceeding the VaR threshold
+ * 
+ * Formula: CVaR_α(L) = (1/(1-α)) × ∫[α,1] VaR_u(L) du ≈ Σ Losses × Kernel Weight
  */
-export function calculateNPKCVaR(returns: number[], alpha: number): number {
-  if (returns.length === 0) return 0;
+export function calculateNPKCVaR(losses: number[], alpha: number = 0.95): number {
+  if (losses.length === 0) return 0;
+
+  // 1. Sort losses to identify the tail (ascending order)
+  const sortedLosses = [...losses].sort((a, b) => a - b);
   
-  // Sort returns for empirical VaR (the "cutoff")
-  const sorted = [...returns].sort((a, b) => a - b);
-  const varIndex = Math.floor(returns.length * (1 - alpha));
-  const empiricalVaR = sorted[varIndex];
+  // 2. Determine VaR threshold using empirical quantile
+  // For CVaR at confidence level α, we look at the top (1-α) tail losses
+  const index = Math.floor(sortedLosses.length * alpha);
+  const varThreshold = sortedLosses[index];
+
+  // 3. Apply Gaussian Kernel Smoothing to the tail losses
+  // Only consider losses that exceed or equal the VaR threshold (the extreme tail)
+  const tailLosses = sortedLosses.slice(index);
   
-  // NPK Implementation: Smoothing the tail expectation
-  // We use the empirical tail but could theoretically apply an Epanechnikov or Gaussian kernel
-  const tailReturns = sorted.filter(r => r <= empiricalVaR);
-  
-  if (tailReturns.length === 0) return Math.abs(empiricalVaR);
-  
-  // The kernel expectation (simplified to weighted tail mean)
-  const expectedShortfall = tailReturns.reduce((sum, r) => sum + r, 0) / tailReturns.length;
-  
-  return Math.abs(expectedShortfall);
+  if (tailLosses.length === 0) return Math.abs(varThreshold);
+
+  // Calculate optimal bandwidth using Silverman's rule of thumb for Gaussian kernel
+  const n = tailLosses.length;
+  const stdDev = Math.sqrt(tailLosses.reduce((acc, loss) => acc + Math.pow(loss - varThreshold, 2), 0) / n);
+  const bandwidth = 1.06 * stdDev * Math.pow(n, -0.2);
+
+  // Apply Gaussian Kernel weighting to tail losses
+  const sumTail = tailLosses.reduce((acc, loss) => {
+    const normalizedDistance = (loss - varThreshold) / bandwidth;
+    const weight = Math.exp(-0.5 * normalizedDistance * normalizedDistance); // Gaussian Kernel K(x)
+    return acc + (loss * weight);
+  }, 0);
+
+  const totalWeight = tailLosses.reduce((acc, loss) => {
+    const normalizedDistance = (loss - varThreshold) / bandwidth;
+    return acc + Math.exp(-0.5 * normalizedDistance * normalizedDistance);
+  }, 0);
+
+  // NPK-CVaR: Weighted average of tail losses with Gaussian smoothing
+  return sumTail / totalWeight;
 }
 
 /**
