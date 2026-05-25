@@ -77,13 +77,13 @@ The platform includes a native `fast-xml-parser` based engine to transform:
 
 ### Liquid Glass Surface Engine v2
 Evolution of the "Nexus Dark" UI with hardened readability and cosmographic depth:
-- **Multilateral Pulse Map**: Integrated HUD for Earth, Moon, ISS, and Mars-Bridge relays.
+- **Global Pulse Map**: Integrated HUD for Earth payment routing, Off-Earth asset management, Orbital asset management, and the hidden Mars-Bridge override.
 - **Color-Coded Theming**: Contextual color injection (Emerald, Purple, Amber, Blue) with high-contrast accessibility overrides in HUD cards.
 - **Translucent Textures**: 40px+ backdrop blur with adaptive alpha surfaces (3-8% white).
 - **Kinetic Accent Animations**: motion/react based particle paths and drop-shadow glow effects.
 
 ### Widget Registry & Dynamic Canvas
-The dashboard is powered by a **Custom Dashboard Engine** (`DashboardCanvas.tsx`) that hot-swaps widgets based on the contextually relevant industry vertical.
+The dashboard is powered by a **Custom Dashboard Engine** (`CustomDashboardEngine.tsx`) that hot-swaps widgets based on the contextually relevant industry vertical. The Oil & Gas demo state now injects hedge-effectiveness and basis-risk cards into the Liquidity Dashboard without duplicating saved user layout entries.
 
 ---
 
@@ -100,6 +100,19 @@ A unified state-interceptor for quantitative stress testing that renders the del
 
 ### 7.4. Interactive ISO Ingestion Gateway
 A dedicated facility for reconciling raw SWIFT messages with the Nexus Topology, using a split-view staged layout.
+
+### 7.5. Asset-Management Pulse Modes
+The Liquidity Dashboard's Global Pulse hero now supports three active operational modes:
+- **Earth**: Live payment-route mesh across major treasury hubs.
+- **Off-Earth**: Lunar/off-earth asset-management view for non-terrestrial treasury assets.
+- **Orbital**: Orbital custody and telemetry control-plane view.
+
+The Mars-Bridge remains a hidden easter egg override rather than a visible switcher item.
+
+### 7.6. Demo Deployment Readiness
+- **Health Probe**: `/api/health` returns app name, version, runtime mode, seed status, and timestamp for Render smoke tests.
+- **Lazy Vertical Loading**: Heavy vertical cockpits, React Flow netting, and AI modules are lazy-loaded so the Liquidity Dashboard reaches first paint faster.
+- **Demo Discovery Paths**: Liquidity Dashboard now exposes a Retail Netting shortcut, while ISO Ingestion includes an in-app sample `pacs.008` payload for judge-ready testing.
 
 ---
 
@@ -130,4 +143,4 @@ CaiSH utilizes a dynamic injection pattern to reconfigure its quantitative core 
 | **Insurance** | ALM Duration Matching | Solvency II Gap Ratio |
 
 ---
-*Last Updated: 2026-04-30 03:40:00Z (Nexus Series B v4.3.0 Industry-Hardened)*
+*Last Updated: 2026-05-22 13:30:00Z (Nexus Series B v4.3.0 Industry-Hardened)*

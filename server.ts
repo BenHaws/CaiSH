@@ -48,6 +48,16 @@ async function startServer() {
 
   // API Routing Table
   const apiRouter = express.Router();
+  apiRouter.get('/health', (req, res) => {
+    res.json({
+      status: 'ok',
+      app: 'CaiSH',
+      version: '4.3.0',
+      mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
+      seeded: true,
+      timestamp: new Date().toISOString()
+    });
+  });
   
   apiRouter.use(treasuryRouter);
   apiRouter.use('/insurance', insuranceRouter);

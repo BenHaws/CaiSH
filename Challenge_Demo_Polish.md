@@ -39,6 +39,8 @@ Goal: Prepare CaiSH for Codex Creator Challenge submission tonight by making the
 - Updated the Global Liquidity widget to a combined bar/line view: bars show total cash position, the line shows total cash projection, and compact YTD/CQ/PQ/NQ controls switch the point of view.
 - Reduced widget header height and content padding to give charts and card content more vertical room.
 - Updated the Liquidity Dashboard grid so standard widgets render three per row on wide screens while the Global Liquidity widget remains full-width. Quarter POVs now show 12 weeks of daily bars/projection data.
+- Fixed an app-shell breakpoint regression where the in-app browser width rendered the sidebar and main dashboard as stacked columns, pushing Liquidity Dashboard below the clipped viewport. Shell now switches to row layout at `md` width so the dashboard loads beside the side nav.
+- Activated the Liquidity Dashboard Off-Earth and Orbital asset management icon controls. Each now switches the Global Pulse hero into its own asset-management HUD state with dedicated background, metrics, asset nodes, and route visualization while preserving the hidden Mars override.
 
 ## Feature / Functionality Modifications
 
@@ -66,4 +68,38 @@ Goal: Prepare CaiSH for Codex Creator Challenge submission tonight by making the
   - `/api/insurance/solvency-metrics`
   - `/api/iso-ingest` with a sample `pacs.008` payment payload
 - Strategy execution smoke test passed at `/api/execute-strategy`; returned `SUCCESS` and updated account balances.
-- In-app browser visual check could not run because the Browser plugin's Node REPL requires Node `>=22.22.0`, while this machine's system Node is `v20.12.1`.
+- In-app browser visual checks now pass for the Liquidity Dashboard shell, Global Pulse hero, and Off-Earth/Orbital asset controls after resetting the browser automation runtime.
+
+## 2026-05-22 Review Notes
+
+Reviewed `TECHNICAL_DEEP_DIVE.md`, `PROMO_VIBE.md`, this polish log, and the current Liquidity Dashboard application surface.
+
+Important alignment updates made:
+- `TECHNICAL_DEEP_DIVE.md` now references `CustomDashboardEngine.tsx` instead of the stale `DashboardCanvas.tsx` name.
+- `TECHNICAL_DEEP_DIVE.md` and `PROMO_VIBE.md` now describe Earth, Off-Earth, Orbital, and hidden Mars modes instead of stale visible Moon/ISS switcher copy.
+- `PROMO_VIBE.md` now frames the visual vibe around global route mesh plus off-earth/orbital control states.
+
+Recommended smoothing backlog for this version:
+1. **Done - Add a Retail Netting shortcut from Liquidity Dashboard**: Added a compact "Run Netting Simulation" CTA below Global Pulse that routes directly to the Retail netting cockpit.
+2. **Done - Create an Industry Mode indicator**: Added a header chip showing the active industry optimization with a one-click route to Admin Console.
+3. **Done - Persist Global Pulse selected mode**: Earth/Off-Earth/Orbital/Mars pulse mode now persists in `localStorage`.
+4. **Done - Tighten Global Pulse responsive layout**: Reduced HUD padding/title scale at the in-app browser width to avoid clipping in Orbital and Off-Earth modes.
+5. **Done - Add demo-safe empty/error states to every widget**: Added visible fallback states for API-fed dashboard widgets, replacing silent console-only failures in the primary dashboard.
+6. **Done - Code-split heavyweight modules**: Lazy-loaded vertical cockpits, Retail netting, Cerebro, and vendor bundles. The production build no longer emits the large chunk warning.
+7. **Done - Normalize route naming in nav and docs**: Public nav label now uses "Liquidity Dashboard"; remaining shorthand stays in implementation/polish notes only.
+8. **Done - Make ISO ingestion sample payload accessible in-app**: Added a "Load Sample" button with a sample `pacs.008` payment payload.
+9. **Done - Add deployment health endpoint**: Added `/api/health` returning version, build mode, seed status, and timestamp.
+10. **In progress - Commit and push the latest polish pass**: Latest app-shell, Global Pulse, docs, and smoothing changes are ready for final build/smoke test before commit/push.
+
+## 2026-05-22 Smoothing Execution
+
+- Added dashboard shortcut from Liquidity Dashboard to Retail Netting Command Center.
+- Added active Industry Mode chip in the app header that opens Admin Console.
+- Persisted Global Pulse mode selection across reloads.
+- Tightened Global Pulse HUD spacing and title scale for the in-app browser viewport.
+- Added visible loading/error fallbacks for primary API-backed dashboard widgets.
+- Added lazy-loaded vertical modules and Vite manual vendor chunks; production build now splits flow, chart, motion, icon, AI, and core vendor bundles.
+- Renamed primary nav label from "Liquidity Cockpit" to "Liquidity Dashboard" for public consistency.
+- Added in-app ISO sample payload loader and tightened parsed journal amount wrapping.
+- Added `/api/health` deployment probe.
+- Smoke-tested root page, `/api/health`, Retail netting shortcut, industry chip, and ISO sample parsing on `localhost:3000`.

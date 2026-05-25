@@ -15,13 +15,14 @@ import {
   rectSortingStrategy 
 } from '@dnd-kit/sortable';
 import { motion, AnimatePresence } from 'motion/react';
-import { Layout, Plus, Save, RotateCcw, Monitor, Trash2, ChevronLeft } from 'lucide-react';
+import { Layout, Plus, Save, RotateCcw, Monitor, ChevronLeft, RefreshCcw, ArrowRightLeft } from 'lucide-react';
 import { treasuryService } from '../../services/treasuryService';
 import { DashboardLayout, WidgetConfig } from '../../types';
 import DashboardWidget from './DashboardWidget';
 import { AvailableWidgets } from './WidgetRegistry';
 import GlobalPulseMap from './GlobalPulseMap';
 import { useIndustry } from '../../IndustryContext';
+import { useNavigation } from '../../contexts/NavigationContext';
 
 const oilGasDashboardCards: WidgetConfig[] = [
   {
@@ -52,6 +53,7 @@ const withOilGasCards = (layout: DashboardLayout): DashboardLayout => {
 
 export default function CustomDashboardEngine() {
   const { activeVertical } = useIndustry();
+  const { setActiveTab } = useNavigation();
   const [layout, setLayout] = useState<DashboardLayout | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -195,6 +197,25 @@ export default function CustomDashboardEngine() {
       {/* Global Pulse Hero */}
       <div className="mb-12">
         <GlobalPulseMap />
+      </div>
+
+      <div className="mb-8 glass-card border-pink-500/20 bg-pink-500/[0.04] px-5 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <div className="w-11 h-11 rounded-xl border border-pink-500/20 bg-pink-500/10 flex items-center justify-center">
+            <ArrowRightLeft className="w-5 h-5 text-pink-300" />
+          </div>
+          <div>
+            <p className="text-[9px] font-black uppercase tracking-[0.28em] text-pink-300">Retail Netting Shortcut</p>
+            <p className="text-xs text-slate-400">Jump to multilateral intercompany netting without changing the active demo story.</p>
+          </div>
+        </div>
+        <button
+          onClick={() => setActiveTab('retail')}
+          className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-pink-500/90 hover:bg-pink-500 text-white text-[10px] font-black uppercase tracking-widest transition-colors"
+        >
+          <RefreshCcw className="w-4 h-4" />
+          Run Netting Simulation
+        </button>
       </div>
 
       {/* Main Dashboard Grid */}

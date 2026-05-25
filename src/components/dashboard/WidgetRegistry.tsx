@@ -32,6 +32,15 @@ const liquiditySeries: Record<LiquidityPeriod, { label: string; cash: number; pr
   NQ: buildQuarterSeries(53.2, 0.061, 1.1)
 };
 
+function WidgetFallback({ title, message }: { title: string; message: string }) {
+  return (
+    <div className="h-full min-h-[120px] flex flex-col items-center justify-center text-center rounded-2xl border border-amber-500/20 bg-amber-500/[0.04] px-5 py-6">
+      <p className="text-[9px] font-black uppercase tracking-[0.24em] text-amber-300 mb-2">{title}</p>
+      <p className="text-xs text-slate-400 leading-relaxed">{message}</p>
+    </div>
+  );
+}
+
 // Global Registry mapping keys to components
 export const WidgetRegistry: Record<string, React.FC<{ entityContext?: CorporateEntity }>> = {
   LIQUIDITY_OVERVIEW: () => {
@@ -166,9 +175,13 @@ export const WidgetRegistry: Record<string, React.FC<{ entityContext?: Corporate
 
   FX_EXPOSURE_MINI: () => {
     const [fx, setFx] = useState<FXExposure[]>([]);
+    const [error, setError] = useState('');
     useEffect(() => {
-      treasuryService.getFXExposures().then(setFx);
+      treasuryService.getFXExposures().then(setFx).catch(() => setError('FX exposure feed is offline. Demo fallback will recover on refresh.'));
     }, []);
+
+    if (error) return <WidgetFallback title="FX Feed Standby" message={error} />;
+    if (fx.length === 0) return <WidgetFallback title="Loading FX Risk" message="Hydrating currency exposures from treasury mocks..." />;
 
     return (
       <div className="space-y-4">
@@ -189,9 +202,13 @@ export const WidgetRegistry: Record<string, React.FC<{ entityContext?: Corporate
 
   PENDING_PAYMENTS: () => {
     const [payments, setPayments] = useState<PaymentItem[]>([]);
+    const [error, setError] = useState('');
     useEffect(() => {
-      treasuryService.getPayments().then(p => setPayments(p.slice(0, 3)));
+      treasuryService.getPayments().then(p => setPayments(p.slice(0, 3))).catch(() => setError('Payment integrity queue is unavailable. No action has been executed.'));
     }, []);
+
+    if (error) return <WidgetFallback title="Payment Queue Standby" message={error} />;
+    if (payments.length === 0) return <WidgetFallback title="Loading Payments" message="Checking high-value settlement queue..." />;
 
     return (
       <div className="space-y-3">
