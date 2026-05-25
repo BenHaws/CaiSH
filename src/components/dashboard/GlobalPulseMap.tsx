@@ -176,12 +176,12 @@ export default function GlobalPulseMap() {
       {/* Dynamic Environment Background */}
       <AnimatePresence mode="wait">
         <motion.div 
-          key={activeRelay}
+          key={currentHub}
           initial={{ opacity: 0 }}
-          animate={{ opacity: activeRelay === 'MARS' ? 0.5 : 0.28 }}
+          animate={{ opacity: currentHub === 'MARS' ? 0.5 : 0.28 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 1.5 }}
-          className={`absolute inset-0 mix-blend-screen scale-110 ${activeRelay === 'MARS' ? 'hue-rotate-[-30deg] saturate-150' : ''}`}
+          className={`absolute inset-0 mix-blend-screen scale-110 ${currentHub === 'MARS' ? 'hue-rotate-[-30deg] saturate-150' : ''}`}
           style={{
             backgroundImage: `url('${config.image}')`,
             backgroundSize: 'cover',
@@ -190,7 +190,7 @@ export default function GlobalPulseMap() {
         />
       </AnimatePresence>
       
-      {activeRelay === 'EARTH' && (
+      {currentHub === 'EARTH' && (
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(59,130,246,0.22),transparent_40%),linear-gradient(180deg,rgba(2,6,23,0.15),rgba(2,6,23,0.78))]" />
           <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
